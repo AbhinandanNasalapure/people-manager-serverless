@@ -1,0 +1,92 @@
+service: people-manager-api
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  serverless-offline:
+    httpPort: 3003
+  dynamodb:
+    start:
+      port: 5000
+      inMemory: true
+      migrate: true
+    stages:
+      - dev
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-2'}
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    PERSON_TABLE: Person-${self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PERSON_TABLE}"
+
+functions:
+  createPerson:
+    handler: src/app/handlers/createPerson.handler
+    events:
+      - http:
+          method: post
+          path: person
+          cors: true
+  getAllPerson:
+    handler: src/app/handlers/getAllPeople.handler
+    events:
+      - http:
+          method: get
+          path: all-people
+          cors: true
+  getPerson:
+    handler: src/app/handlers/getPerson.handler
+    events:
+      - http:
+          method: get
+          path: person/{personId}
+          cors: true
+  updatePerson:
+    handler: src/app/handlers/updatePerson.handler
+    events:
+      - http:
+          method: put
+          path: person/{personId}
+          cors: true
+  deletePerson:
+    handler: src/app/handlers/deletePerson.handler
+    events:
+      - http:
+          method: delete
+          path: person/{personId}
+          cors: true
+
+resources:
+  Resources:
+    PersonListTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PERSON_TABLE}
+        AttributeDefinitions:
+          - AttributeName: personId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: personId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
