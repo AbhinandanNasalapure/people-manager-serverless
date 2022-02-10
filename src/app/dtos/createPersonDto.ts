@@ -1,8 +1,9 @@
 interface CreatePerson {
   body: {
-    personName: string;
+    firstName: string;
+    lastName: string;
     address: string;
-    dateOfBirth: string;
+    phoneNumber: string;
   };
 }
 

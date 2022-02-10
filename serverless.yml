@@ -6,6 +6,8 @@ plugins:
   - serverless-offline
 
 custom:
+  stage: ${opt:stage, self:provider.stage}
+  environment: ${file(./environments.yml):environments.${self:custom.stage}}
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
@@ -17,16 +19,17 @@ custom:
       inMemory: true
       migrate: true
     stages:
-      - dev
+      - ${self:custom.stage}
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-2'}
+  stage: dev
+  region: ${opt:region, 'eu-west-2'}
   environment:
-    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    PERSON_TABLE: Person-${self:provider.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: ${self:custom.environment.awsNodeJSConnectionReuseEnabled}
+    PERSON_TABLE: Person-${self:custom.stage}
+    DYNAMODB_CONN_URL: ${self:custom.environment.dynamodbUrl}
   iamRoleStatements:
     - Effect: Allow
       Action:

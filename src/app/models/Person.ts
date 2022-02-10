@@ -1,8 +1,9 @@
 interface Person {
   personId: string;
-  personName: string;
+  firstName: string;
+  lastName: string;
   address: string;
-  dateOfBirth: string;
+  phoneNumber: string;
 }
 
 export default Person;

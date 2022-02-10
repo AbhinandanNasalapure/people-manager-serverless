@@ -15,7 +15,7 @@ export const handler: Handler = middify(
     event: APIGatewayEvent & createPerson,
     context: Context
   ): Promise<APIGatewayProxyResult> => {
-    const { personName, address, dateOfBirth } = event.body;
+    const { firstName, lastName, address, phoneNumber } = event.body;
 
     try {
       const personId: string = generateUniqueId({
@@ -24,9 +24,10 @@ export const handler: Handler = middify(
       });
       const person = await personService.createPerson({
         personId,
-        personName,
+        firstName,
+        lastName,
         address,
-        dateOfBirth
+        phoneNumber
       });
 
       return formatJSONResponse(201, person);

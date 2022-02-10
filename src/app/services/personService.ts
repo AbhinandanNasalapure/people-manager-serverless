@@ -45,14 +45,15 @@ class PersonServie {
         TableName: this.tableName,
         Key: { personId },
         UpdateExpression:
-          "set #personName = :personName, address = :address, dateOfBirth = :dateOfBirth",
+          "set #firstName = :firstName, lastName = :lastName, address = :address, phoneNumber = :phoneNumber",
         ExpressionAttributeNames: {
-          "#personName": "personName",
+          "#firstName": "firstName",
         },
         ExpressionAttributeValues: {
-          ":personName": partialPerson.personName,
+          ":firstName": partialPerson.firstName,
+          ":lastName": partialPerson.lastName,
           ":address": partialPerson.address,
-          ":dateOfBirth": partialPerson.dateOfBirth,
+          ":phoneNumber": partialPerson.phoneNumber,
         },
         ReturnValues: "ALL_NEW",
       })

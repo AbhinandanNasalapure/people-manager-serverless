@@ -1,0 +1,10 @@
+environments:
+  dev:
+    dynamodbUrl: http://localhost:5000
+    awsNodeJSConnectionReuseEnabled: 1
+  staging:
+    dynamodbUrl: http://dummy-acc-url
+    awsNodeJSConnectionReuseEnabled: 0
+  prd:
+    dynamodbUrl: http://dummy-prd-url
+    awsNodeJSConnectionReuseEnabled: 1
