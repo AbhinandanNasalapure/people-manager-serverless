@@ -4,7 +4,8 @@
   "description": "Api to manage people using appropriate endpoints.",
   "main": "index.js",
   "scripts": {
-    "start": "sls offline start",
+    "start:local": "sls offline start",
+    "deploy:prd": "sls deploy --stage=prd",
     "test": "jest index.test.ts"
   },
   "dependencies": {
