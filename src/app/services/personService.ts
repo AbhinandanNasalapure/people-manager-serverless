@@ -1,3 +1,4 @@
+import * as AWS from "aws-sdk";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import Person from "../models/Person";
 
@@ -35,7 +36,21 @@ class PersonServie {
         Item: person,
       })
       .promise();
-
+      try {
+        const sqs = new AWS.SQS({
+          endpoint: 'http://localhost:9324',
+          region: 'eu-west-1'
+        });
+        
+        await sqs.sendMessage({
+            QueueUrl: 'http://localhost:9324/queue/person-queue',
+            MessageBody:  JSON.stringify(person),
+          })
+          .promise();
+      }
+      catch(err) {
+        console.error('SQS failed to send', {error: err});
+      }
     return person;
   }
 

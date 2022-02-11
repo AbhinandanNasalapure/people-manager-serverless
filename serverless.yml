@@ -3,6 +3,7 @@ service: people-manager-api
 plugins:
   - serverless-webpack
   - serverless-dynamodb-local
+  - serverless-offline-sqs
   - serverless-offline
 
 custom:
@@ -20,16 +21,24 @@ custom:
       migrate: true
     stages:
       - ${self:custom.stage}
+  serverless-offline-sqs:            
+    apiVersion: '2012-11-05'
+    endpoint: http://0.0.0.0:9324
+    region: eu-west-1
+    skipCacheInvalidation: false
+    stages:
+      - ${self:custom.stage}
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: ${opt:region, 'eu-west-2'}
+  region: ${opt:region, 'eu-west-1'}
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: ${self:custom.environment.awsNodeJSConnectionReuseEnabled}
     PERSON_TABLE: Person-${self:custom.stage}
     DYNAMODB_CONN_URL: ${self:custom.environment.dynamodbUrl}
+    PERSON_QUEUE: Person-${self:custom.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -78,6 +87,15 @@ functions:
           path: person/{personId}
           cors: true
 
+  createPersonEventHandler:
+    handler: src/app/handlers/personCreationEventHandler.queueHandler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PersonQueue
+              - Arn
+              
 resources:
   Resources:
     PersonListTable:
@@ -93,3 +111,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    PersonQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: person-queue
