@@ -14,6 +14,7 @@
     "@middy/http-cors": "^2.2.0",
     "@middy/http-json-body-parser": "^2.2.0",
     "aws-lambda": "^1.0.6",
+    "axios": "^0.25.0",
     "generate-unique-id": "^2.0.1",
     "node": "^12.3.1"
   },
